@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>ShopDeploy Store</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Simple modern styling -->
+  <style>
+    :root {
+      --primary: #2563eb;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #1e293b;
+      --muted: #64748b;
+      --error: #dc2626;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    header {
+      background: var(--primary);
+      color: white;
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2rem;
+    }
+
+    header p {
+      margin-top: 0.5rem;
+      opacity: 0.9;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .status {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: var(--muted);
+    }
+
+    .products {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 1.25rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+    }
+
+    .card h3 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1.1rem;
+    }
+
+    .price {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: var(--primary);
+    }
+
+    .error {
+      text-align: center;
+      color: var(--error);
+      font-weight: 500;
+    }
+
+    footer {
+      margin-top: 4rem;
+      padding: 1.5rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>ShopDeploy Store</h1>
+    <p>Powered by AWS ECS · ALB · RDS · S3</p>
+  </header>
+
+  <main>
+    <div class="status" id="status">
+      Loading products from cloud infrastructure…
+    </div>
+
+    <div class="products" id="products"></div>
+
+    <div class="error" id="error"></div>
+  </main>
+
+  <footer>
+    © 2025 ShopDeploy · Cloud-Native Demo Project
+  </footer>
+
+  <script>
+    /**
+     * IMPORTANT:
+     * Use HTTP here because ALB has no HTTPS yet.
+     * Browser blocks HTTPS → HTTP only if frontend is HTTPS.
+     * S3 static hosting over HTTP is fine.
+     */
+    const API_BASE = "http://shopdeploy-alb-1697832627.ap-south-2.elb.amazonaws.com";
+
+    const productsEl = document.getElementById("products");
+    const statusEl = document.getElementById("status");
+    const errorEl = document.getElementById("error");
+
+    fetch(`${API_BASE}/products`)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`API error: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((products) => {
+        statusEl.textContent = "";
+
+        if (!products.length) {
+          statusEl.textContent = "No products available.";
+          return;
+        }
+
+        products.forEach((p) => {
+          const card = document.createElement("div");
+          card.className = "card";
+
+          card.innerHTML = `
+            <h3>${p.name}</h3>
+            <div class="price">₹ ${p.price}</div>
+          `;
+
+          productsEl.appendChild(card);
+        });
+      })
+      .catch((err) => {
+        console.error(err);
+        statusEl.textContent = "";
+        errorEl.textContent = "Failed to load products. Please try again later.";
+      });
+  </script>
+
+</body>
+</html>

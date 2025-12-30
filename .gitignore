@@ -1,0 +1,31 @@
+# Node
+node_modules/
+npm-debug.log*
+backend/node_modules/
+
+# Terraform
+.terraform/
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
+infra/.terraform/
+infra/terraform.tfstate
+infra/terraform.tfstate.*
+infra/tfplan
+
+# Env & secrets
+.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Terraform
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+
+# OS / binaries
+*.exe
+*.zip
